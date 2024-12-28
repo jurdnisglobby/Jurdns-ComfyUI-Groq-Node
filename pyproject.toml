@@ -1,0 +1,15 @@
+[project]
+name = "jurdns-groq-node"
+description = "This node utilizes the Groq.com API to enhance prompts. (Place API key and main system prompt in the groq_config.json)"
+version = "1.0.0"
+license = {file = "LICENSE"}
+dependencies = ["groq"]
+
+[project.urls]
+Repository = "https://github.com/jurdnisglobby/ComfyUI-Jurdns-Groq-Node"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ComfyUI-Jurdns-Groq-Node"
+Icon = ""
