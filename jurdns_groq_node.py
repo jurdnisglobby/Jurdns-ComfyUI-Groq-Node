@@ -21,14 +21,15 @@ class JurdnsGroqAPIPromptEnhancer:
             with open(self.config_path, "r") as f:
                 self.config = json.load(f)
         except FileNotFoundError:
-            self.config = {"api_key": "", "system_prompt": ""}
+            # Create a config with default values
+            self.config = {"api_key": "", "system_prompt": "", "model": "gemma2-9b-it"}
             self.save_config()
-            print(f"groq_config.json created. Please populate with your API key and system prompt at: {self.config_path}")
+            print(f"groq_config.json created with default values. Please edit at: {self.config_path}")
         except json.JSONDecodeError:
             print(f"Error decoding groq_config.json. Please ensure it is valid JSON at: {self.config_path}")
-            self.config = {"api_key": "", "system_prompt": ""}
+            # Reset to default values
+            self.config = {"api_key": "", "system_prompt": "", "model": "gemma2-9b-it"}
             self.save_config()
-            print(f"groq_config.json created. Please populate with your API key and system prompt at: {self.config_path}")
 
     def save_config(self):
         with open(self.config_path, "w") as f:
@@ -52,10 +53,14 @@ class JurdnsGroqAPIPromptEnhancer:
     CATEGORY = "Groq-Node"
 
     def execute(self, text, override_system_prompt=None):
-        if not self.config["api_key"]:
+        if not self.config.get("api_key"):
             return ("Error: API key not configured. Please edit groq_config.json",)
 
-        system_prompt_to_use = override_system_prompt if override_system_prompt is not None else self.config.get("system_prompt", "")
+        if not self.config.get("model"):
+            return ("Error: Model not configured. Please edit groq_config.json",)
+
+        # Correctly handle the default system prompt
+        system_prompt_to_use = override_system_prompt if override_system_prompt else self.config.get("system_prompt", "")
 
         client = Groq(api_key=self.config["api_key"])
 
@@ -65,15 +70,14 @@ class JurdnsGroqAPIPromptEnhancer:
         messages.append({"role": "user", "content": text})
 
         try:
-            # Use non-streaming request to get the full response at once
             completion = client.chat.completions.create(
-                model="gemma2-9b-it",  # Use the model you need
+                model=self.config["model"],  # Get model from config file
                 messages=messages,
                 temperature=0.5,
                 max_tokens=1024,
                 top_p=1,
                 stop=None,
-                stream=False  # Set stream to False for a regular response
+                stream=False
             )
             return (completion.choices[0].message.content,)
 
