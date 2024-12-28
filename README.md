@@ -1,4 +1,4 @@
-Jurdn's Groq Node README
+Jurdn's Groq Node
 
 This is a very simple node. It utilizes the Groq API. (https://www.groq.com) 
 
